@@ -1,0 +1,6 @@
+Revision history for Perl extension PDF::Reuse::OverlayChart.
+
+0.01  Wed Feb  4 17:36:11 2004
+	- original version; created by h2xs 1.22 with options
+		-AXOb 5.6.0 -skip-exporter PDF::Reuse::OverlayChart
+
