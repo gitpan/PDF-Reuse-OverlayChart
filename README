@@ -1,4 +1,4 @@
-PDF/Reuse/OverlayChart version 0.01
+PDF/Reuse/OverlayChart version 0.02
 ===================================
 
 This is a module to produce simple and sometimes mixed charts with the help of 
@@ -34,7 +34,7 @@ This module requires these other modules:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2004 Lars Lundberg, Solidez HB
+Copyright (C) 2004 - 2005 Lars Lundberg, Solidez HB
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
