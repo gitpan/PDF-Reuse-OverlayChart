@@ -1,8 +1,8 @@
-PDF/Reuse/OverlayChart version 0.02
+PDF/Reuse/OverlayChart version 0.03
 ===================================
 
 This is a module to produce simple and sometimes mixed charts with the help of 
-PDF::Reuse. It replaces PDF::Reuse::SimpleChart, which will be removed.
+PDF::Reuse.
 
 For usage look at the examples in the POD for this module.
 

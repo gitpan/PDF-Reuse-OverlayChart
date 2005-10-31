@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our %possible = (x           => 1,
                  y           => 1,
@@ -14,6 +14,8 @@ our %possible = (x           => 1,
                  size        => 1,
                  xsize       => 1,
                  ysize       => 1,
+                 initialmaxy => 1,
+                 initialminy => 1,
                  type        => 1,
                  background  => 1,
                  yunit       => 1,
@@ -263,6 +265,7 @@ sub analysera
    }
   
    $num = (defined $num) ? ($num + 1) : 0;
+   
    my $posPercent = 0;
    my $negPercent = 0;
 
@@ -516,6 +519,17 @@ sub draw
       $chartMin = $min;
    }
    
+   if ((defined $self->{initialmaxy})
+   &&  ($self->{initialmaxy} > $chartMax))
+   {  $chartMax = $self->{initialmaxy}
+   }
+   
+   if ((defined $self->{initialminy})
+   &&  ($self->{initialminy} < $chartMin))
+   {  $chartMin = $self->{initialminy}
+   }
+   
+   
    if ((exists $param{'merge'}) && ($self->{type} ne 'percentbars'))
    {  for (@{$param{'merge'}})
       {   if ($_->{type} ne 'percentbars')
@@ -625,7 +639,7 @@ sub draw
    my $xStart = $xArrow + 10;
    my $yStart = $yAreaEnd;
    
-   my $iStep  = sprintf("%.3f", ($yAxis / $num));
+   my $iStep  = sprintf("%.3f", ($yAxis / $groups));
    if ($chartMax < 0)
    {  $y0 = $yAreaEnd;
    }
@@ -1171,7 +1185,7 @@ sub draw_bars
                        $k++;
                        next;
                     }
-                    $height = $_ * $prop; 
+                    $height = sprintf("%.5f", ($_ * $prop)); 
                     $string .= "$color[$i] rg\n";
                     $string .= "$xCor $y0 $fraction $height re\n";
                     $string .= "b*\n";
@@ -1190,7 +1204,7 @@ sub draw_bars
                  }
              }
              else
-             {   $height = $self->{series}->{$namn}->[$j] * $prop;
+             {   $height = sprintf("%.5f", ($self->{series}->{$namn}->[$j] * $prop));
                  $string .= "$color[$i] rg\n";
                  $string .= "$xCor $y0 $width $height re\n";
                  $string .= "b*\n";
@@ -1255,7 +1269,7 @@ sub draw_totalbars
                       next;
                    }      
                    if ($value > 0)
-                   {   $height  = $value * $prop; 
+                   {   $height  = sprintf("%.5f", ($value * $prop)); 
                        $string .= "$color[$k] rg\n";
                        $string .= "$x $y $fraction $height re\n";
                        $string .= "b*\n";
@@ -1273,7 +1287,7 @@ sub draw_totalbars
                        $k++;
                    }
                    elsif ($value < 0)
-                   {   $height  = $value * $prop; 
+                   {   $height  = sprintf("%.5f", ($value * $prop)); 
                        $string .= "$color[$k] rg\n";
                        $string .= "$x $yNeg $fraction $height re\n";
                        $string .= "b*\n";
@@ -1309,7 +1323,7 @@ sub draw_totalbars
                   next;
                }      
                if ($value > 0)
-               {   $height  = $value * $prop; 
+               {   $height  = sprintf("%.5f", ($value * $prop)); 
                    $string .= "$color[$k] rg\n";
                    $string .= "$x $y $fraction $height re\n";
                    $string .= "b*\n";
@@ -1328,7 +1342,7 @@ sub draw_totalbars
                    $k++;
                }
                elsif ($value < 0)
-               {   $height  = $value * $prop; 
+               {   $height  = sprintf("%.5f", ($value * $prop)); 
                    $string .= "$color[$k] rg\n";
                    $string .= "$x $yNeg $fraction $height re\n";
                    $string .= "b*\n";
@@ -1400,7 +1414,7 @@ sub draw_lines
                           $x += $step;
                           next;
                        }
-                       $height = ($_ - $offSet) * $prop;
+                       $height = sprintf("%.5f", (($_ - $offSet) * $prop));
                        $height += $yCor;
                        $x2 = $x - 1.5;
                        $y2 = $height - 1.5;
@@ -1428,7 +1442,7 @@ sub draw_lines
               }
               else
               {   $x += $labelStep / 2;
-                  $height = ($self->{series}->{$namn}->[$j] - $offSet) * $prop;
+                  $height = sprintf("%.5f", (($self->{series}->{$namn}->[$j] - $offSet) * $prop));
                   $height += $yCor;
                   $x2 = $x - 1.5;
                   $y2 = $height - 1.5;
@@ -1648,7 +1662,7 @@ sub draw_area
                           $x += $fraction;
                       }
                       elsif ($_ > 0)
-                      {   $y = ($pos[$j][$k] * $prop) + $y0;
+                      {   $y = sprintf("%.5f", (($pos[$j][$k] * $prop) + $y0));
                           if (! defined $move)
                           {  $string .= "$x $y0 m\n";
                              $string .= "$x $y l\n";
@@ -1660,7 +1674,7 @@ sub draw_area
                       }
                       elsif ($_ < 0)
                       {   $neg[$j][$k] = 0 if (! defined $neg[$j][$k]);
-                          $y = $y0 - ($neg[$j][$k] * $prop);
+                          $y = sprintf("%.5f", ($y0 - ($neg[$j][$k] * $prop)));
                           if (! defined $move)
                           {  $string .= "$x $y0 m\n";
                              $string .= "$x $y l\n";
@@ -1680,7 +1694,7 @@ sub draw_area
               else
               {   $fraction = $labelStep / 2;
                   if ($value > 0)
-                  {   $y = ($pos[$j] * $prop) + $y0;
+                  {   $y = sprintf("%.5f", (($pos[$j] * $prop) + $y0));
                       if (! defined $move)
                       {  $string .= "$x $y0 m\n";
                          $string .= "$x $y l\n";
@@ -1692,7 +1706,7 @@ sub draw_area
                   }
                   elsif ($value < 0)
                   {   $neg[$j] = 0 if (! defined $neg[$j]);
-                      $y = $y0 - ($neg[$j] * $prop);
+                      $y = sprintf("%.5f", ($y0 - ($neg[$j] * $prop)));
                       if (! defined $move)
                       {  $string .= "$x $y0 m\n";
                          $string .= "$x $y l\n";
@@ -1788,7 +1802,7 @@ To draw charts with the help of PDF::Reuse. Currently there are 5 types:
 'bars', 'totalbars','percentbars', 'lines' and 'area'. 
 
 The charts can be overlaid, so you can mix the types in the same chart. (Except for
-'percentbars'. Currently it can't be freely combined with the others.)
+'percentbars', which can't be freely combined with the others.)
 The entities shown, should have something in common, like the unit of the y-axis, but
 that is not really necessary. It is up to you, what you want to combine and relate.
 
@@ -1960,6 +1974,14 @@ Titel above the column to the right of the chart
 =item groupsText
 
 Text under groupsTitle
+
+=item initialMaxY
+
+To force the program start with a specific max (positive) value for the scale along the y-axis.
+
+=item initialMinY
+
+To force the program start with a specific min (negative) value for the scale along the y-axis.
 
 =item merge
 
@@ -2162,7 +2184,9 @@ An invented company with a few offices.
 
 In this example you let a program collect historical quotes for 'Amazon', approximately
 1 year back, and also values for 'S&P 100' and then you get a chart with combined
-data, an area graph for volumes, and lines for the other values. 
+data, an area graph for volumes, and lines for the other values. (You need to have the
+environment variable TZ defined somewhere, see Date::Manip, which is a module needed by
+Finance::QuoteHist. TZ, time zone, could e.g. be CET or GMT in Western Europe.) 
 
 
 =for overlay.pl begin
@@ -2198,7 +2222,7 @@ data, an area graph for volumes, and lines for the other values.
    # Accumulate the values in hashes
    ##################################
 
-   for my $row ($q->quote_get()) 
+   for my $row ($q->quotes()) 
    {  my ($symbol, $date, $open, $high, $low, $close, $volume) = @$row;
       if ($date =~ m'(\d+\/\d+)\/(\d+)'o)
       {   my $yearMonth = $1;
@@ -2353,6 +2377,10 @@ main cart is pained last. It also automatically gets the left scale.
 
    PDF::Reuse
    PDF::Reuse::Tutorial
+
+=head1 MAILING LIST
+
+   http://groups.google.com/group/PDF-Reuse
 
 =head1 AUTHOR
 
